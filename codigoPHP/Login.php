@@ -1,3 +1,6 @@
+<?php  
+session_start(); // Iniciar la sesión
+?>
 <!DOCTYPE html>
 <html lang = "en">
     <head>
@@ -114,87 +117,82 @@
         </nav>
 
         <?php
-        /**
-         * @author Ismael Ferreras García
-         * @version 1.0
-         * @since 28/11/2023
-         */
-        include_once('../core/231018libreriaValidacion.php'); //Importar la libreria de validacion
-        $entradaOK = true; //Indica si todas las respuestas son correctas
-        $_REQUEST['fecha_deshabilitada'] = date('Y-m-d - H:i:s'); //Inicializamos la fecha actual ya que es un campo desabilitado
-//Almacena las respuestas
+        include_once('../core/231018libreriaValidacion.php'); // Importar la librería de validación
+        require_once '../config/confDB.php';
+
+        $entradaOK = true; // Indica si todas las respuestas son correctas
+        $_REQUEST['fecha_deshabilitada'] = date('Y-m-d - H:i:s'); // Inicializamos la fecha actual ya que es un campo deshabilitado
+// Almacena las respuestas
         $aRespuestas = [
             'usuario' => '',
             'contrasena' => ''
         ];
-//Almacena los errores
+
+// Almacena los errores
         $aErrores = [
             'usuario' => '',
             'contrasena' => ''
         ];
-//Validar los campos
-        if (isset($_REQUEST['enviar'])) {
 
+// Validar los campos
+        if (isset($_REQUEST['enviar'])) {
             $aErrores = [
                 'usuario' => validacionFormularios::comprobarAlfaNumerico($_REQUEST['usuario'], 32, 4, 1),
                 'contrasena' => validacionFormularios::validarPassword($_REQUEST['contrasena'], 32, 4, 2, 1)
             ];
-//Recorre aErrores para ver si hay alguno
+
+            // Recorre aErrores para ver si hay alguno
             foreach ($aErrores as $campo => $valor) {
-                if ($valor == !null) {
+                if ($valor != null) {
                     $entradaOK = false;
-//Limpiamos el campo
+                    // Limpiamos el campo
                     $_REQUEST[$campo] = '';
                 }
             }
         } else {
             $entradaOK = false;
         }
-//En caso de que '$entradaOK' sea true, cargamos las respuestas en el array '$aRespuestas' 
+
+// En caso de que '$entradaOK' sea true, cargamos las respuestas en el array '$aRespuestas' 
         if ($entradaOK) {
             $aRespuestas = [
                 'usuario' => $_REQUEST['usuario'],
                 'contrasena' => $_REQUEST['contrasena']
             ];
 
-            // Variables de conexión con la base de datos
-            define('HOST', '192.168.20.19');
-            define('DBNAME', 'DB208DWESLoginLogoffTema5');
-            define('USERNAME', 'user208DWESLoginLogoffTema5');
-            define('PASSWORD', 'paso');
-            //Conexion a la base de datos
-            $miDB = new PDO("mysql:host=" . HOST . ";dbname=" . DBNAME, USERNAME, PASSWORD);
+            // Conexion a la base de datos
+            $miDB = new PDO(DSN, USERNAME, PASSWORD);
             $usuario = $_REQUEST['usuario'];
             $contrasena = $_REQUEST['contrasena'];
             $hashContrasena = hash('sha256', $usuario . $contrasena);
+
             // Preparar la consulta SQL para verificar las credenciales
             $stmt = $miDB->prepare("SELECT * FROM T01_Usuario WHERE T01_CodUsuario = :usuario AND T01_Password = :hashContrasena");
-            //Ejecutamos la consulta
+
+            // Ejecutamos la consulta
             $stmt->execute(['usuario' => $usuario, 'hashContrasena' => $hashContrasena]);
 
-            //Almacenamos el resultado de la query como objeto mediante FETCH_OBJ
+            // Almacenamos el resultado de la query como objeto mediante FETCH_OBJ
             $result = $stmt->fetch(PDO::FETCH_OBJ);
+
             if ($result) {
                 // Incrementamos el número de conexiones
                 $numConexiones = $result->T01_NumConexiones + 1;
+
                 // Actualizamos la fecha y hora de la última conexión
                 $fechaHoraUltimaConexion = $result->T01_FechaHoraUltimaConexion;
+
                 // Actualizamos la base de datos con la nueva información
                 $miDB->query("UPDATE T01_Usuario SET T01_NumConexiones = $numConexiones, T01_FechaHoraUltimaConexion = CURRENT_TIMESTAMP WHERE T01_CodUsuario = '$usuario'");
-                // Configuramos cookies para almacenar la información del usuario
-                setcookie('usuario', $result->T01_DescUsuario, time() + (86400 * 365), "/");
-                setcookie('numConexiones', $numConexiones, time() + (86400 * 365), "/");
-                setcookie('ultimaConexion', $fechaHoraUltimaConexion, time() + (86400 * 365), "/");
-                // Acceder a las cookies
-                $numConexiones = $_COOKIE['numConexiones'] ?? '';
-                $ultimaConexion = $_COOKIE['ultimaConexion'] ?? '';
-                //Si introducimos bien el usuario y la contraseña nos muestra un mensaje de bienvenida
-                // Mostrar la información
-                echo "Bienvenido, $result->T01_DescUsuario.<br>";
-                echo "Esta es tu $numConexiones vez conectándote.<br>";
-                echo "Te conectaste por última vez el $ultimaConexion.<br>";
 
-                echo '<a href = "Detalle.php">Detalle</a >';
+                // Configuramos sesiones para almacenar la información del usuario
+                $_SESSION['usuario'] = $result->T01_DescUsuario;
+                $_SESSION['numConexiones'] = $numConexiones;
+                $_SESSION['ultimaConexion'] = $fechaHoraUltimaConexion;
+
+                // Redirigir a programa.php
+                echo '<meta http-equiv="refresh" content="0;url=Programa.php">';
+                exit(); // Asegurarse de que el script se detenga después de la redirección
             } else {
                 // Mostramos un mensaje de error y el formulario nuevamente
                 ?>
@@ -216,8 +214,8 @@
                 </form>
                 <?php
             }
-            //Formulario que se le muetra al cliente para que lo rellene
         } else {
+            // Formulario que se le muestra al cliente para que lo rellene
             ?>
             <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
                 <table>
@@ -230,7 +228,7 @@
                         <td><label for="contrasena">Contraseña:</label></td>
                         <td><input class="obligatorio" type="password" id="contrasena" name="contrasena" value="<?php echo (isset($_REQUEST['contrasena']) ? $_REQUEST['contrasena'] : ''); ?>"></td>
                         <td class="error"><?php echo (!empty($aErrores["contrasena"]) ? $aErrores["contrasena"] : ''); ?></td>
-                    </tr>                                                                                  
+                    </tr>
                 </table>
                 <input name="enviar" type="submit" value="Iniciar Sesion">
             </form>
