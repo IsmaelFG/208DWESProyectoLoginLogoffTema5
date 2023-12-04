@@ -1,9 +1,14 @@
 <?php
 session_start(); // Iniciar la sesión
 // Acceder a las variables de sesión
-$usuario = $_SESSION['usuario'] ?? '';
-$numConexiones = $_SESSION['numConexiones'] ?? '';
-$ultimaConexion = $_SESSION['ultimaConexion'] ?? '';
+
+if(empty($_SESSION['usuario']) || empty($_SESSION['numConexiones']) || empty($_SESSION['ultimaConexion'])){
+    echo '<meta http-equiv="refresh" content="0;url=Login.php">'; // Redirige a la página de inicio de sesión
+    exit();
+}
+$usuario = $_SESSION['usuario'];
+$numConexiones = $_SESSION['numConexiones'];
+$ultimaConexion = $_SESSION['ultimaConexion'];
 
 // Cerrar sesión al hacer clic en el botón
 if (isset($_POST['cerrar_sesion'])) {
