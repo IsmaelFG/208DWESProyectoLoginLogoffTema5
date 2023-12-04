@@ -1,4 +1,4 @@
-<?php  
+<?php
 session_start(); // Iniciar la sesión
 ?>
 <!DOCTYPE html>
@@ -140,26 +140,6 @@ session_start(); // Iniciar la sesión
                 'usuario' => validacionFormularios::comprobarAlfaNumerico($_REQUEST['usuario'], 32, 4, 1),
                 'contrasena' => validacionFormularios::validarPassword($_REQUEST['contrasena'], 32, 4, 2, 1)
             ];
-
-            // Recorre aErrores para ver si hay alguno
-            foreach ($aErrores as $campo => $valor) {
-                if ($valor != null) {
-                    $entradaOK = false;
-                    // Limpiamos el campo
-                    $_REQUEST[$campo] = '';
-                }
-            }
-        } else {
-            $entradaOK = false;
-        }
-
-// En caso de que '$entradaOK' sea true, cargamos las respuestas en el array '$aRespuestas' 
-        if ($entradaOK) {
-            $aRespuestas = [
-                'usuario' => $_REQUEST['usuario'],
-                'contrasena' => $_REQUEST['contrasena']
-            ];
-
             // Conexion a la base de datos
             $miDB = new PDO(DSN, USERNAME, PASSWORD);
             $usuario = $_REQUEST['usuario'];
@@ -174,26 +154,47 @@ session_start(); // Iniciar la sesión
 
             // Almacenamos el resultado de la query como objeto mediante FETCH_OBJ
             $result = $stmt->fetch(PDO::FETCH_OBJ);
+            if (!$result) {
+                $entradaOK = false;
+            }
 
-            if ($result) {
-                // Incrementamos el número de conexiones
-                $numConexiones = $result->T01_NumConexiones + 1;
+            // Recorre aErrores para ver si hay alguno
+            foreach ($aErrores as $campo => $valor) {
+                if ($valor != null) {
+                    $entradaOK = false;
+                    // Limpiamos el campo
+                    $_REQUEST[$campo] = '';
+                }
+            }
+        } else {
+            $entradaOK = false;
+        }
+        // En caso de que '$entradaOK' sea true, cargamos las respuestas en el array '$aRespuestas' 
+        if ($entradaOK) {
+            $aRespuestas = [
+                'usuario' => $_REQUEST['usuario'],
+                'contrasena' => $_REQUEST['contrasena']
+            ];
+            // Incrementamos el número de conexiones
+            $numConexiones = $result->T01_NumConexiones + 1;
 
-                // Actualizamos la fecha y hora de la última conexión
-                $fechaHoraUltimaConexion = $result->T01_FechaHoraUltimaConexion;
+            // Actualizamos la fecha y hora de la última conexión
+            $fechaHoraUltimaConexion = $result->T01_FechaHoraUltimaConexion;
 
-                // Actualizamos la base de datos con la nueva información
-                $miDB->query("UPDATE T01_Usuario SET T01_NumConexiones = $numConexiones, T01_FechaHoraUltimaConexion = CURRENT_TIMESTAMP WHERE T01_CodUsuario = '$usuario'");
+            // Actualizamos la base de datos con la nueva información
+            $miDB->query("UPDATE T01_Usuario SET T01_NumConexiones = $numConexiones, T01_FechaHoraUltimaConexion = CURRENT_TIMESTAMP WHERE T01_CodUsuario = '$usuario'");
 
-                // Configuramos sesiones para almacenar la información del usuario
-                $_SESSION['usuario'] = $result->T01_DescUsuario;
-                $_SESSION['numConexiones'] = $numConexiones;
-                $_SESSION['ultimaConexion'] = $fechaHoraUltimaConexion;
+            // Configuramos sesiones para almacenar la información del usuario
+            $_SESSION['usuario'] = $result->T01_DescUsuario;
+            $_SESSION['numConexiones'] = $numConexiones;
+            $_SESSION['ultimaConexion'] = $fechaHoraUltimaConexion;
 
-                // Redirigir a programa.php
-                echo '<meta http-equiv="refresh" content="0;url=Programa.php">';
-                exit(); // Asegurarse de que el script se detenga después de la redirección
-            } else {
+            // Redirigir a programa.php
+            echo '<meta http-equiv="refresh" content="0;url=Programa.php">';
+            exit(); // Asegurarse de que el script se detenga después de la redirección
+        } else {
+            //Si el fromulario a sido enviado pero el usuario o contraseña no ha sido valdiado 
+            if (isset($_REQUEST['enviar']) && !$result) {
                 // Mostramos un mensaje de error y el formulario nuevamente
                 ?>
                 <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
@@ -213,26 +214,26 @@ session_start(); // Iniciar la sesión
                     <input name="enviar" type="submit" value="Iniciar Sesion">
                 </form>
                 <?php
+            } else {
+                // Formulario que se le muestra al cliente para que lo rellene
+                ?>
+                <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
+                    <table>
+                        <tr>
+                            <td><label for="usuario">Usuario:</label></td>
+                            <td><input class="obligatorio" type="text" id="usuario" name="usuario" value="<?php echo (isset($_REQUEST['usuario']) ? $_REQUEST['usuario'] : ''); ?>"></td>
+                            <td class="error"><?php echo (!empty($aErrores["usuario"]) ? $aErrores["usuario"] : ''); ?></td>
+                        </tr>
+                        <tr>
+                            <td><label for="contrasena">Contraseña:</label></td>
+                            <td><input class="obligatorio" type="password" id="contrasena" name="contrasena" value="<?php echo (isset($_REQUEST['contrasena']) ? $_REQUEST['contrasena'] : ''); ?>"></td>
+                            <td class="error"><?php echo (!empty($aErrores["contrasena"]) ? $aErrores["contrasena"] : ''); ?></td>
+                        </tr>
+                    </table>
+                    <input name="enviar" type="submit" value="Iniciar Sesion">
+                </form>
+                <?php
             }
-        } else {
-            // Formulario que se le muestra al cliente para que lo rellene
-            ?>
-            <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
-                <table>
-                    <tr>
-                        <td><label for="usuario">Usuario:</label></td>
-                        <td><input class="obligatorio" type="text" id="usuario" name="usuario" value="<?php echo (isset($_REQUEST['usuario']) ? $_REQUEST['usuario'] : ''); ?>"></td>
-                        <td class="error"><?php echo (!empty($aErrores["usuario"]) ? $aErrores["usuario"] : ''); ?></td>
-                    </tr>
-                    <tr>
-                        <td><label for="contrasena">Contraseña:</label></td>
-                        <td><input class="obligatorio" type="password" id="contrasena" name="contrasena" value="<?php echo (isset($_REQUEST['contrasena']) ? $_REQUEST['contrasena'] : ''); ?>"></td>
-                        <td class="error"><?php echo (!empty($aErrores["contrasena"]) ? $aErrores["contrasena"] : ''); ?></td>
-                    </tr>
-                </table>
-                <input name="enviar" type="submit" value="Iniciar Sesion">
-            </form>
-            <?php
         }
         ?>
         <footer class="bg-primary text-light py-4 fixed-bottom">
