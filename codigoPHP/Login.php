@@ -123,7 +123,6 @@
         require_once '../config/confDB.php';
 
         $entradaOK = true; // Indica si todas las respuestas son correctas
-        $_REQUEST['fecha_deshabilitada'] = date('Y-m-d - H:i:s'); // Inicializamos la fecha actual ya que es un campo deshabilitado
 // Almacena las respuestas
         $aRespuestas = [
             'usuario' => '',
