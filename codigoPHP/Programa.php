@@ -1,15 +1,17 @@
 <?php
+
+/**
+ * @author Ismael Ferreras García
+ * @version 1.0
+ * @since 1/12/2023
+ */
 session_start(); // Iniciar la sesión
 // Acceder a las variables de sesión
 
-if(empty($_SESSION['usuario']) || empty($_SESSION['numConexiones']) || empty($_SESSION['ultimaConexion'])){
+if (empty($_SESSION['usuarioDAW208LoginLogOffTema5']) || empty($_SESSION['numConexiones']) || empty($_SESSION['ultimaConexion'])) {
     echo '<meta http-equiv="refresh" content="0;url=Login.php">'; // Redirige a la página de inicio de sesión
     exit();
 }
-$usuario = $_SESSION['usuario'];
-$numConexiones = $_SESSION['numConexiones'];
-$ultimaConexion = $_SESSION['ultimaConexion'];
-
 // Cerrar sesión al hacer clic en el botón
 if (isset($_POST['cerrar_sesion'])) {
     session_unset(); // Desvincula todas las variables de sesión
@@ -19,9 +21,9 @@ if (isset($_POST['cerrar_sesion'])) {
 }
 
 // Mostrar la información
-echo "Bienvenido, $usuario.<br>";
-echo "Esta es tu $numConexiones vez conectándote.<br>";
-echo "Te conectaste por última vez el $ultimaConexion.<br>";
+echo "Bienvenido, {$_SESSION['usuarioDAW208LoginLogOffTema5']}.<br>";
+echo "Esta es tu {$_SESSION['numConexiones']} vez conectándote.<br>";
+echo "Te conectaste por última vez el {$_SESSION['ultimaConexion']}.<br>";
 
 // Formulario de cierre de sesión
 echo '<form method="post" action="">';

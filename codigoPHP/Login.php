@@ -1,6 +1,3 @@
-<?php
-session_start(); // Iniciar la sesión
-?>
 <!DOCTYPE html>
 <html lang = "en">
     <head>
@@ -117,6 +114,11 @@ session_start(); // Iniciar la sesión
         </nav>
 
         <?php
+        /**
+         * @author Ismael Ferreras García
+         * @version 1.0
+         * @since 1/12/2023
+         */
         include_once('../core/231018libreriaValidacion.php'); // Importar la librería de validación
         require_once '../config/confDB.php';
 
@@ -131,7 +133,8 @@ session_start(); // Iniciar la sesión
 // Almacena los errores
         $aErrores = [
             'usuario' => '',
-            'contrasena' => ''
+            'contrasena' => '',
+            'errorAutentificacion' => ''
         ];
 
 // Validar los campos
@@ -144,18 +147,19 @@ session_start(); // Iniciar la sesión
             $miDB = new PDO(DSN, USERNAME, PASSWORD);
             $usuario = $_REQUEST['usuario'];
             $contrasena = $_REQUEST['contrasena'];
-            $hashContrasena = hash('sha256', $usuario . $contrasena);
 
             // Preparar la consulta SQL para verificar las credenciales
             $stmt = $miDB->prepare("SELECT * FROM T01_Usuario WHERE T01_CodUsuario = :usuario AND T01_Password = :hashContrasena");
 
             // Ejecutamos la consulta
-            $stmt->execute(['usuario' => $usuario, 'hashContrasena' => $hashContrasena]);
+            $stmt->execute(['usuario' => $usuario, 'hashContrasena' => hash('sha256', $usuario . $contrasena)]);
 
             // Almacenamos el resultado de la query como objeto mediante FETCH_OBJ
-            $result = $stmt->fetch(PDO::FETCH_OBJ);
-            if (!$result) {
-                $entradaOK = false;
+            $oUsuarioActivo = $stmt->fetch(PDO::FETCH_OBJ);
+            if (!$oUsuarioActivo) {
+                $aErrores = [
+                    'errorAutentificacion' => 'Error de autentificacion. Vuelve a introducir las credenciales.'
+                ];
             }
 
             // Recorre aErrores para ver si hay alguno
@@ -175,65 +179,46 @@ session_start(); // Iniciar la sesión
                 'usuario' => $_REQUEST['usuario'],
                 'contrasena' => $_REQUEST['contrasena']
             ];
+
+            // Iniciar la sesión
+            session_start();
             // Incrementamos el número de conexiones
-            $numConexiones = $result->T01_NumConexiones + 1;
+            $numConexiones = $oUsuarioActivo->T01_NumConexiones + 1;
 
             // Actualizamos la fecha y hora de la última conexión
-            $fechaHoraUltimaConexion = $result->T01_FechaHoraUltimaConexion;
+            $fechaHoraUltimaConexion = $oUsuarioActivo->T01_FechaHoraUltimaConexion;
+            // Configuramos sesiones para almacenar la información del usuario
+            $_SESSION['usuarioDAW208LoginLogOffTema5'] = $oUsuarioActivo->T01_DescUsuario;
+            $_SESSION['numConexiones'] = $numConexiones;
+            $_SESSION['ultimaConexion'] = $fechaHoraUltimaConexion;
 
             // Actualizamos la base de datos con la nueva información
             $miDB->query("UPDATE T01_Usuario SET T01_NumConexiones = $numConexiones, T01_FechaHoraUltimaConexion = CURRENT_TIMESTAMP WHERE T01_CodUsuario = '$usuario'");
-
-            // Configuramos sesiones para almacenar la información del usuario
-            $_SESSION['usuario'] = $result->T01_DescUsuario;
-            $_SESSION['numConexiones'] = $numConexiones;
-            $_SESSION['ultimaConexion'] = $fechaHoraUltimaConexion;
 
             // Redirigir a programa.php
             echo '<meta http-equiv="refresh" content="0;url=Programa.php">';
             exit(); // Asegurarse de que el script se detenga después de la redirección
         } else {
             //Si el fromulario a sido enviado pero el usuario o contraseña no ha sido valdiado 
-            if (isset($_REQUEST['enviar']) && !$result) {
-                // Mostramos un mensaje de error y el formulario nuevamente
-                ?>
-                <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
-                    <table>
-                        <tr>
-                            <td><label for="usuario">Usuario:</label></td>
-                            <td><input class="obligatorio" type="text" id="usuario" name="usuario" value="<?php echo (isset($_REQUEST['usuario']) ? $_REQUEST['usuario'] : ''); ?>"></td>
-                            <td class="error"><?php echo (!empty($aErrores["usuario"]) ? $aErrores["usuario"] : ''); ?></td>
-                        </tr>
-                        <tr>
-                            <td><label for="contrasena">Contraseña:</label></td>
-                            <td><input class="obligatorio" type="password" id="contrasena" name="contrasena" value="<?php echo (isset($_REQUEST['contrasena']) ? $_REQUEST['contrasena'] : ''); ?>"></td>
-                            <td class="error"><?php echo (!empty($aErrores["contrasena"]) ? $aErrores["contrasena"] : ''); ?></td>
-                        </tr>
-                    </table>
-                    <p class='error'>Usuario o contraseña incorrectos. Inténtalo de nuevo.</p>
-                    <input name="enviar" type="submit" value="Iniciar Sesion">
-                </form>
-                <?php
-            } else {
-                // Formulario que se le muestra al cliente para que lo rellene
-                ?>
-                <form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post">
-                    <table>
-                        <tr>
-                            <td><label for="usuario">Usuario:</label></td>
-                            <td><input class="obligatorio" type="text" id="usuario" name="usuario" value="<?php echo (isset($_REQUEST['usuario']) ? $_REQUEST['usuario'] : ''); ?>"></td>
-                            <td class="error"><?php echo (!empty($aErrores["usuario"]) ? $aErrores["usuario"] : ''); ?></td>
-                        </tr>
-                        <tr>
-                            <td><label for="contrasena">Contraseña:</label></td>
-                            <td><input class="obligatorio" type="password" id="contrasena" name="contrasena" value="<?php echo (isset($_REQUEST['contrasena']) ? $_REQUEST['contrasena'] : ''); ?>"></td>
-                            <td class="error"><?php echo (!empty($aErrores["contrasena"]) ? $aErrores["contrasena"] : ''); ?></td>
-                        </tr>
-                    </table>
-                    <input name="enviar" type="submit" value="Iniciar Sesion">
-                </form>
-                <?php
-            }
+            // Mostramos un mensaje de error y el formulario nuevamente
+            ?>
+            <form action="<?php echo $_SERVER ['PHP_SELF']; ?>" method="post">
+                <table>
+                    <tr>
+                        <td><label for="usuario">Usuario:</label></td>
+                        <td><input class="obligatorio" type="text" id="usuario" name="usuario" value="<?php echo (isset($_REQUEST['usuario']) ? $_REQUEST['usuario'] : ''); ?>"></td>
+                        <td class="error"><?php echo (!empty($aErrores["usuario"]) ? $aErrores["usuario"] : ''); ?></td>
+                    </tr>
+                    <tr>
+                        <td><label for="contrasena">Contraseña:</label></td>
+                        <td><input class="obligatorio" type="password" id="contrasena" name="contrasena" value="<?php echo (isset($_REQUEST['contrasena']) ? $_REQUEST['contrasena'] : ''); ?>"></td>
+                        <td class="error"><?php echo (!empty($aErrores["contrasena"]) ? $aErrores["contrasena"] : ''); ?></td>
+                    </tr>
+                </table>
+                <p class='error'><?php echo (!empty($aErrores["errorAutentificacion"]) ? $aErrores["errorAutentificacion"] : ''); ?>.</p>
+                <input name="enviar" type="submit" value="Iniciar Sesion">
+            </form>
+            <?php
         }
         ?>
         <footer class="bg-primary text-light py-4 fixed-bottom">
@@ -259,4 +244,3 @@ session_start(); // Iniciar la sesión
         </footer>
     </body>
 </html>
-

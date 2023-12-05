@@ -1,4 +1,9 @@
 <?php
+/**
+ * @author Ismael Ferreras García
+ * @version 1.0
+ * @since 21/11/2023
+ */
 session_start(); // Iniciar la sesión
 ?>
 <!DOCTYPE html>
