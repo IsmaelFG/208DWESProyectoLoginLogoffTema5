@@ -140,7 +140,10 @@
             'usuario' => '',
             'contrasena' => '',
         ];
-
+        if (isset($_REQUEST['volver'])) {
+            header('Location:../indexProyectoLoginLogoffTema5.html'); // Redirige a la página
+            exit();
+        }
         if (isset($_REQUEST['enviar'])) {
             // Conexion a la base de datos
             $miDB = new PDO(DSN, USERNAME, PASSWORD);
@@ -171,11 +174,15 @@
         // En caso de que '$entradaOK' sea true, cargamos las respuestas en el array '$aRespuestas' 
         if ($entradaOK) {
             // Iniciar la sesión
+            //Si el numero de conexiones es 0 
+            if ($oUsuarioActivo->T01_NumConexiones == 0) {
+                $fechaHoraUltimaConexionAnterior = "primera vez que te conectas";
+            } else {
+                // Actualizamos la fecha y hora de la última conexión
+                $fechaHoraUltimaConexionAnterior = $oUsuarioActivo->T01_FechaHoraUltimaConexion;
+            }
             // Incrementamos el número de conexiones
             $numConexionesActual = $oUsuarioActivo->T01_NumConexiones + 1;
-
-            // Actualizamos la fecha y hora de la última conexión
-            $fechaHoraUltimaConexionAnterior = $oUsuarioActivo->T01_FechaHoraUltimaConexion;
             // Configuramos sesiones para almacenar la información del usuario
             session_start();
             $_SESSION['usuarioDAW208LoginLogOffTema5'] = $oUsuarioActivo->T01_DescUsuario;
@@ -207,7 +214,7 @@
                 </table>
                 <p class='error'><?php echo (!empty($aErrores["usuario"]) ? $aErrores["usuario"] : ''); ?></p>
                 <input name="enviar" type="submit" value="Iniciar Sesion">
-                <button class="volver" type="button" onclick="window.location.href = '../indexProyectoLoginLogoffTema5.html'">Volver</button>
+                <input class="volver" type="submit" name="volver" value="Volver">
             </form>
             <?php
         }

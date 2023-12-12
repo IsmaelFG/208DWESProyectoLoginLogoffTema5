@@ -18,16 +18,16 @@ if (isset($_POST['cerrar_sesion'])) {
     exit();
 }
 
-// Cerrar sesión al hacer clic en el botón
+// Ir a detalle al pulsar el boton
 if (isset($_POST['detalle'])) {
-    header('Location:Detalle.php'); // Redirige a la página de inicio de sesión
+    header('Location:Detalle.php'); // Redirige a la página
     exit();
 }
 
 // Mostrar la información
 echo "Bienvenido, {$_SESSION['usuarioDAW208LoginLogOffTema5']}.<br>";
 echo "Esta es tu {$_SESSION['numConexiones']} vez conectándote.<br>";
-echo "Te conectaste por última vez el {$_SESSION['ultimaConexion']}.<br>";
+echo "Te conectaste por última vez {$_SESSION['ultimaConexion']}.<br>";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -65,7 +65,7 @@ echo "Te conectaste por última vez el {$_SESSION['ultimaConexion']}.<br>";
         // Formulario de cierre de sesión
         echo '<form method="post" action="">';
         echo '<input class="cerrar_sesion" type="submit" name="cerrar_sesion" value="Cerrar Sesión">';
-         echo '<input class="detalle" type="submit" name="detalle" value="Detalle">';
+        echo '<input class="detalle" type="submit" name="detalle" value="Detalle">';
         echo '</form>';
         ?>
         <footer class="bg-primary text-light py-4 fixed-bottom">

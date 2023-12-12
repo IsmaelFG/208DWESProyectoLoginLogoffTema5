@@ -38,8 +38,14 @@ session_start(); // Recuperar la sesión
                 </button>
             </div>
         </nav>
-        <button class="volver" type="button" onclick="window.location.href = 'Programa.php'">Volver</button>
+        <form action="<?php echo $_SERVER ['PHP_SELF']; ?>" method="post">
+            <input class="volver" type="submit" name="volver" value="Volver">
+        </form>
         <?php
+        if (isset($_REQUEST['volver'])) {
+            header('Location:Programa.php'); // Redirige a la página
+            exit();
+        }
         /**
          * @author Ismael Ferreras García
          * @version 1.0
