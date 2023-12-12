@@ -4,7 +4,7 @@
  * @version 1.0
  * @since 21/11/2023
  */
-session_start(); // Iniciar la sesión
+session_start(); // Recuperar la sesión
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -14,6 +14,19 @@ session_start(); // Iniciar la sesión
         <title>Detalle</title>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
         <link rel="stylesheet" href="/208DWESProyectoTema3/webroot/css/style.css">
+        <style>
+            .volver {
+                background-color: #007BFF;
+                color: #fff;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                margin-top: 20px;
+                margin-right: 20px;
+
+            }
+        </style>
     </head>
     <body style="margin-top:70px">
         <nav class="navbar navbar-expand-lg bg-primary fixed-top">
@@ -25,18 +38,13 @@ session_start(); // Iniciar la sesión
                 </button>
             </div>
         </nav>
-
+        <button class="volver" type="button" onclick="window.location.href = 'Programa.php'">Volver</button>
         <?php
         /**
          * @author Ismael Ferreras García
          * @version 1.0
          * @since 21/11/2023
          */
-        echo '<br><br><h2>Variable <b>$_SERVER</b></h2>';
-        foreach ($_SERVER as $key => $value) {
-            echo "<b>$key</b>: $value<br>";
-        }
-
         if (isset($_SESSION)) {
             echo '<br><br><h2>Variable <b>$_SESSION</b></h2>';
             foreach ($_SESSION as $key => $value) {
@@ -48,6 +56,10 @@ session_start(); // Iniciar la sesión
 
         echo '<br><br><h2>Variable <b>$_COOKIE</b></h2>';
         foreach ($_COOKIE as $key => $value) {
+            echo "<b>$key</b>: $value<br>";
+        }
+        echo '<br><br><h2>Variable <b>$_SERVER</b></h2>';
+        foreach ($_SERVER as $key => $value) {
             echo "<b>$key</b>: $value<br>";
         }
 
@@ -93,10 +105,10 @@ session_start(); // Iniciar la sesión
                         </a>
                     </div>
                     <div class="col text-end">
-                        <a href="../indexProyectoTema3.html">
+                        <a href="../indexProyectoLoginLogoffTema5.html">
                             <img src="/webroot/imagenes/casa-removebg-preview.png" alt="Home" width="35" height="35">
                         </a>
-                        <a href="https://github.com/IsmaelFG" target="_blank">
+                        <a href="https://github.com/IsmaelFG/208DWESProyectoLoginLogoffTema5" target="_blank">
                             <img src="/webroot/imagenes/github-removebg-preview.png" alt="GitHub" width="35" height="35">
                         </a>
                     </div>

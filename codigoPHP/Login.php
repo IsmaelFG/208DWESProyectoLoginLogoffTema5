@@ -93,6 +93,17 @@
                 margin-right: 20px;
 
             }
+            input[type = "submit"],.volver {
+                background-color: #007BFF;
+                color: #fff;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                margin-top: 20px;
+                margin-right: 20px;
+
+            }
             .error{
                 color: red;
             }
@@ -102,6 +113,7 @@
             }
         </style>
     </head>
+
     <body style = "margin-top:70px; margin-bottom: 100px">
         <nav class = "navbar navbar-expand-lg bg-primary fixed-top">
             <div class = "container">
@@ -123,44 +135,28 @@
         require_once '../config/confDB.php';
 
         $entradaOK = true; // Indica si todas las respuestas son correctas
-// Almacena las respuestas
-        $aRespuestas = [
-            'usuario' => '',
-            'contrasena' => ''
-        ];
-
-// Almacena los errores
+        // Almacena los errores
         $aErrores = [
             'usuario' => '',
             'contrasena' => '',
-            'errorAutentificacion' => ''
         ];
 
-// Validar los campos
         if (isset($_REQUEST['enviar'])) {
-            $aErrores = [
-                'usuario' => validacionFormularios::comprobarAlfaNumerico($_REQUEST['usuario'], 32, 4, 1),
-                'contrasena' => validacionFormularios::validarPassword($_REQUEST['contrasena'], 32, 4, 2, 1)
-            ];
             // Conexion a la base de datos
             $miDB = new PDO(DSN, USERNAME, PASSWORD);
-            $usuario = $_REQUEST['usuario'];
-            $contrasena = $_REQUEST['contrasena'];
 
             // Preparar la consulta SQL para verificar las credenciales
             $stmt = $miDB->prepare("SELECT * FROM T01_Usuario WHERE T01_CodUsuario = :usuario AND T01_Password = :hashContrasena");
-
             // Ejecutamos la consulta
-            $stmt->execute(['usuario' => $usuario, 'hashContrasena' => hash('sha256', $usuario . $contrasena)]);
+            $stmt->execute(['usuario' => $_REQUEST['usuario'], 'hashContrasena' => hash('sha256', $_REQUEST['usuario'] . $_REQUEST['contrasena'])]);
 
             // Almacenamos el resultado de la query como objeto mediante FETCH_OBJ
             $oUsuarioActivo = $stmt->fetch(PDO::FETCH_OBJ);
-            if (!$oUsuarioActivo) {
-                $aErrores = [
-                    'errorAutentificacion' => 'Error de autentificacion. Vuelve a introducir las credenciales.'
-                ];
-            }
-
+            // Validar los campos
+            $aErrores = [
+                'usuario' => (!$oUsuarioActivo) ? 'Error de autentificacion. Vuelve a introducir las credenciales.' : validacionFormularios::comprobarAlfaNumerico($_REQUEST['usuario'], 32, 4, 1),
+                'contrasena' => (!$oUsuarioActivo) ? 'Error de autentificacion. Vuelve a introducir las credenciales.' : validacionFormularios::validarPassword($_REQUEST['contrasena'], 32, 4, 2, 1)
+            ];
             // Recorre aErrores para ver si hay alguno
             foreach ($aErrores as $campo => $valor) {
                 if ($valor != null) {
@@ -174,28 +170,25 @@
         }
         // En caso de que '$entradaOK' sea true, cargamos las respuestas en el array '$aRespuestas' 
         if ($entradaOK) {
-            $aRespuestas = [
-                'usuario' => $_REQUEST['usuario'],
-                'contrasena' => $_REQUEST['contrasena']
-            ];
-
             // Iniciar la sesión
-            session_start();
             // Incrementamos el número de conexiones
-            $numConexiones = $oUsuarioActivo->T01_NumConexiones + 1;
+            $numConexionesActual = $oUsuarioActivo->T01_NumConexiones + 1;
 
             // Actualizamos la fecha y hora de la última conexión
-            $fechaHoraUltimaConexion = $oUsuarioActivo->T01_FechaHoraUltimaConexion;
+            $fechaHoraUltimaConexionAnterior = $oUsuarioActivo->T01_FechaHoraUltimaConexion;
             // Configuramos sesiones para almacenar la información del usuario
+            session_start();
             $_SESSION['usuarioDAW208LoginLogOffTema5'] = $oUsuarioActivo->T01_DescUsuario;
-            $_SESSION['numConexiones'] = $numConexiones;
-            $_SESSION['ultimaConexion'] = $fechaHoraUltimaConexion;
+            $_SESSION['numConexiones'] = $numConexionesActual;
+            $_SESSION['ultimaConexion'] = $fechaHoraUltimaConexionAnterior;
 
-            // Actualizamos la base de datos con la nueva información
-            $miDB->query("UPDATE T01_Usuario SET T01_NumConexiones = $numConexiones, T01_FechaHoraUltimaConexion = CURRENT_TIMESTAMP WHERE T01_CodUsuario = '$usuario'");
+            // Preparar la consulta SQL para actualizar los datos
+            $stmt = $miDB->prepare("UPDATE T01_Usuario SET T01_NumConexiones = $numConexionesActual, T01_FechaHoraUltimaConexion = CURRENT_TIMESTAMP WHERE T01_CodUsuario = :usuario");
+            // Ejecutamos la consulta
+            $stmt->execute(['usuario' => $_REQUEST['usuario']]);
 
             // Redirigir a programa.php
-            echo '<meta http-equiv="refresh" content="0;url=Programa.php">';
+            header("refresh:0;url=Programa.php");
             exit(); // Asegurarse de que el script se detenga después de la redirección
         } else {
             //Si el fromulario a sido enviado pero el usuario o contraseña no ha sido valdiado 
@@ -206,21 +199,20 @@
                     <tr>
                         <td><label for="usuario">Usuario:</label></td>
                         <td><input class="obligatorio" type="text" id="usuario" name="usuario" value="<?php echo (isset($_REQUEST['usuario']) ? $_REQUEST['usuario'] : ''); ?>"></td>
-                        <td class="error"><?php echo (!empty($aErrores["usuario"]) ? $aErrores["usuario"] : ''); ?></td>
                     </tr>
                     <tr>
                         <td><label for="contrasena">Contraseña:</label></td>
                         <td><input class="obligatorio" type="password" id="contrasena" name="contrasena" value="<?php echo (isset($_REQUEST['contrasena']) ? $_REQUEST['contrasena'] : ''); ?>"></td>
-                        <td class="error"><?php echo (!empty($aErrores["contrasena"]) ? $aErrores["contrasena"] : ''); ?></td>
                     </tr>
                 </table>
-                <p class='error'><?php echo (!empty($aErrores["errorAutentificacion"]) ? $aErrores["errorAutentificacion"] : ''); ?>.</p>
+                <p class='error'><?php echo (!empty($aErrores["usuario"]) ? $aErrores["usuario"] : ''); ?></p>
                 <input name="enviar" type="submit" value="Iniciar Sesion">
+                <button class="volver" type="button" onclick="window.location.href = '../indexProyectoLoginLogoffTema5.html'">Volver</button>
             </form>
             <?php
         }
         ?>
-        <footer class="bg-primary text-light py-4 fixed-bottom">
+        <footer class ="bg-primary text-light py-4 fixed-bottom">
             <div class="container">
                 <div class="row">
                     <div class="col text-center text-white">
@@ -231,10 +223,10 @@
                         </a>
                     </div>
                     <div class="col text-end">
-                        <a href="../indexProyectoTema3.html">
+                        <a href="../indexProyectoLoginLogoffTema5.html">
                             <img src="/webroot/imagenes/casa-removebg-preview.png" alt="Home" width="35" height="35">
                         </a>
-                        <a href="https://github.com/IsmaelFG" target="_blank">
+                        <a href="https://github.com/IsmaelFG/208DWESProyectoLoginLogoffTema5" target="_blank">
                             <img src="/webroot/imagenes/github-removebg-preview.png" alt="GitHub" width="35" height="35">
                         </a>
                     </div>
