@@ -1,3 +1,11 @@
+<?php
+/**
+ * @author Ismael Ferreras García
+ * @version 1.0
+ * @since 21/11/2023
+ */
+
+?>
 <!DOCTYPE html>
 <html lang="es">
 
@@ -37,6 +45,7 @@
                         aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
+                <setcookie("idioma",$idioma,time()+1000,"/");
             </div>
         </nav>
         <div class="position-absolute top-50 start-50 translate-middle">

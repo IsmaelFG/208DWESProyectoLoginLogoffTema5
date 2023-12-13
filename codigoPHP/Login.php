@@ -1,3 +1,14 @@
+<?php
+/**
+ * @author Ismael Ferreras García
+ * @version 1.0
+ * @since 1/12/2023
+ */
+if (isset($_REQUEST['volver'])) {
+    header('Location:../indexProyectoLoginLogoffTema5.php'); // Redirige a la página
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang = "en">
     <head>
@@ -126,11 +137,6 @@
         </nav>
 
         <?php
-        /**
-         * @author Ismael Ferreras García
-         * @version 1.0
-         * @since 1/12/2023
-         */
         include_once('../core/231018libreriaValidacion.php'); // Importar la librería de validación
         require_once '../config/confDB.php';
 
@@ -140,10 +146,6 @@
             'usuario' => '',
             'contrasena' => '',
         ];
-        if (isset($_REQUEST['volver'])) {
-            header('Location:../indexProyectoLoginLogoffTema5.html'); // Redirige a la página
-            exit();
-        }
         if (isset($_REQUEST['enviar'])) {
             // Conexion a la base de datos
             $miDB = new PDO(DSN, USERNAME, PASSWORD);
@@ -176,7 +178,7 @@
             // Iniciar la sesión
             //Si el numero de conexiones es 0 
             if ($oUsuarioActivo->T01_NumConexiones == 0) {
-                $fechaHoraUltimaConexionAnterior = "primera vez que te conectas";
+                $fechaHoraUltimaConexionAnterior = "primera";
             } else {
                 // Actualizamos la fecha y hora de la última conexión
                 $fechaHoraUltimaConexionAnterior = $oUsuarioActivo->T01_FechaHoraUltimaConexion;
@@ -195,7 +197,7 @@
             $stmt->execute(['usuario' => $_REQUEST['usuario']]);
 
             // Redirigir a programa.php
-            header("refresh:0;url=Programa.php");
+            header("Location:Programa.php");
             exit(); // Asegurarse de que el script se detenga después de la redirección
         } else {
             //Si el fromulario a sido enviado pero el usuario o contraseña no ha sido valdiado 

@@ -4,7 +4,19 @@
  * @version 1.0
  * @since 21/11/2023
  */
-session_start(); // Recuperar la sesión
+// Recuperar la sesión
+session_start();
+// Acceder a las variables de sesión
+if (empty($_SESSION['usuarioDAW208LoginLogOffTema5']) || empty($_SESSION['numConexiones']) || empty($_SESSION['ultimaConexion'])) {
+    // Redirige a la página de inicio de sesión
+    header("Location:Login.php"); 
+    exit();
+}
+if (isset($_REQUEST['volver'])) {
+    // Redirige a la página principal del programa
+    header('Location:Programa.php'); 
+    exit();
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -24,7 +36,6 @@ session_start(); // Recuperar la sesión
                 cursor: pointer;
                 margin-top: 20px;
                 margin-right: 20px;
-
             }
         </style>
     </head>
@@ -42,10 +53,6 @@ session_start(); // Recuperar la sesión
             <input class="volver" type="submit" name="volver" value="Volver">
         </form>
         <?php
-        if (isset($_REQUEST['volver'])) {
-            header('Location:Programa.php'); // Redirige a la página
-            exit();
-        }
         /**
          * @author Ismael Ferreras García
          * @version 1.0
