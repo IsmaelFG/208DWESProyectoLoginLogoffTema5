@@ -23,11 +23,22 @@ if (isset($_POST['detalle'])) {
     header('Location:Detalle.php'); // Redirige a la página
     exit();
 }
+$idioma = isset($_COOKIE['idioma']) ? $_COOKIE['idioma'] : 'es';
 
+// Define los mensajes según el idioma
+if ($idioma == 'ES') {
+    $bienvenida = "Bienvenido, {$_SESSION['usuarioDAW208LoginLogOffTema5']}.<br>";
+    $numConexiones = "Esta es tu {$_SESSION['numConexiones']} vez conectándote.<br>";
+    $ultimaConexion = "Te conectaste por última vez {$_SESSION['ultimaConexion']}.";
+} elseif ($idioma == 'EN') {
+    $bienvenida = "Welcome, {$_SESSION['usuarioDAW208LoginLogOffTema5']}.<br>";
+    $numConexiones = "This is your {$_SESSION['numConexiones']} time logging in.<br>";
+    $ultimaConexion = "You last logged in on {$_SESSION['ultimaConexion']}.";
+}
 // Mostrar la información
-echo "Bienvenido, {$_SESSION['usuarioDAW208LoginLogOffTema5']}.<br>";
-echo "Esta es tu {$_SESSION['numConexiones']} vez conectándote.<br>";
-echo "Te conectaste por última vez {$_SESSION['ultimaConexion']}.<br>";
+echo $bienvenida;
+echo $numConexiones;
+echo $ultimaConexion;
 ?>
 <!DOCTYPE html>
 <html lang="en">

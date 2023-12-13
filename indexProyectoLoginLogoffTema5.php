@@ -4,7 +4,20 @@
  * @version 1.0
  * @since 21/11/2023
  */
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Verifica si se ha enviado el formulario por POST
+    if (isset($_POST['idioma'])) {
+        // Obtiene el valor del idioma seleccionado
+        $idioma = $_POST['idioma'];
 
+        // Establece la cookie con el idioma seleccionado
+        setcookie("idioma", $idioma, time() + (1000), "/");
+
+        // Redirige a la página del programa
+        header("Location: codigoPHP/Login.php");
+        exit();
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -45,14 +58,19 @@
                         aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <setcookie("idioma",$idioma,time()+1000,"/");
+                <form method="post" action="">
+                    <select name="idioma" id="idioma">
+                        <option value="ES">Español</option>
+                        <option value="EN">English</option>
+                    </select>
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </form>
+
             </div>
         </nav>
         <div class="position-absolute top-50 start-50 translate-middle">
             <h1>LoginLogoffTema5</h1>
         </div>
-        <button class="login" type="button"
-                onclick="window.location.href = '/208DWESProyectoLoginLogoffTema5/codigoPHP/Login.php'">Login</button>
         <footer class="bg-primary text-light py-4 fixed-bottom">
             <div class="container">
                 <div class="row">

@@ -178,7 +178,7 @@ if (isset($_REQUEST['volver'])) {
             // Iniciar la sesión
             //Si el numero de conexiones es 0 
             if ($oUsuarioActivo->T01_NumConexiones == 0) {
-                $fechaHoraUltimaConexionAnterior = "primera";
+                $fechaHoraUltimaConexionAnterior = "primera vez conectandote";
             } else {
                 // Actualizamos la fecha y hora de la última conexión
                 $fechaHoraUltimaConexionAnterior = $oUsuarioActivo->T01_FechaHoraUltimaConexion;
