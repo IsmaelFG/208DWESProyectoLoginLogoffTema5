@@ -63,7 +63,8 @@ if (isset($_GET['idioma'])) {
                     <a class="boton" href="?idioma=en">
                         <img src="webroot/imagenes/english.png" alt="en" width="30" height="20">
                     </a>
-                </div>              <form method="post" action="">
+                </div>              
+                <form method="post" action="">
                     <button type="submit" class="btn btn-primary">Login</button>
                 </form>
 
