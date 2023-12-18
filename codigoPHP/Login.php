@@ -176,13 +176,8 @@ if (isset($_REQUEST['volver'])) {
         // En caso de que '$entradaOK' sea true, cargamos las respuestas en el array '$aRespuestas' 
         if ($entradaOK) {
             // Iniciar la sesión
-            //Si el numero de conexiones es 0 
-            if ($oUsuarioActivo->T01_NumConexiones == 0) {
-                $fechaHoraUltimaConexionAnterior = "primera vez conectandote";
-            } else {
-                // Actualizamos la fecha y hora de la última conexión
-                $fechaHoraUltimaConexionAnterior = $oUsuarioActivo->T01_FechaHoraUltimaConexion;
-            }
+            // Actualizamos la fecha y hora de la última conexión
+            $fechaHoraUltimaConexionAnterior = $oUsuarioActivo->T01_FechaHoraUltimaConexion;
             // Incrementamos el número de conexiones
             $numConexionesActual = $oUsuarioActivo->T01_NumConexiones + 1;
             // Configuramos sesiones para almacenar la información del usuario

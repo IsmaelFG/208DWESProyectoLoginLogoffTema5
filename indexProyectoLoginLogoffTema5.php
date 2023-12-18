@@ -5,18 +5,15 @@
  * @since 21/11/2023
  */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Verifica si se ha enviado el formulario por POST
-    if (isset($_POST['idioma'])) {
-        // Obtiene el valor del idioma seleccionado
-        $idioma = $_POST['idioma'];
-
-        // Establece la cookie con el idioma seleccionado
-        setcookie("idioma", $idioma, time() + (1000), "/");
-
-        // Redirige a la página del programa
-        header("Location: codigoPHP/Login.php");
-        exit();
-    }
+    // Redirige a la página del programa
+    header("Location: codigoPHP/Login.php");
+    exit();
+}
+if (isset($_GET['idioma'])) {
+    $idioma = $_GET['idioma'];
+    setcookie("idioma", $idioma, time() + (30 * 24 * 60 * 60), "/");
+    header('Location: ' . $_SERVER['PHP_SELF']);
+    exit;
 }
 ?>
 <!DOCTYPE html>
@@ -54,15 +51,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <nav class="navbar navbar-expand-lg bg-primary">
             <div class="container">
                 <a class="navbar-brand text-white" href="/index.html">LoginLogoffTema5</a>
+
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                         aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <form method="post" action="">
-                    <select name="idioma" id="idioma">
-                        <option value="ES">Español</option>
-                        <option value="EN">English</option>
-                    </select>
+                <div>
+                    <a class="boton" href="?idioma=es">
+                        <img src="webroot/imagenes/spain.jpg" alt="es" width="30" height="20">
+                    </a>
+                    <a class="boton" href="?idioma=en">
+                        <img src="webroot/imagenes/english.png" alt="en" width="30" height="20">
+                    </a>
+                </div>              <form method="post" action="">
                     <button type="submit" class="btn btn-primary">Login</button>
                 </form>
 
