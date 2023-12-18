@@ -7,7 +7,7 @@
 // Recuperar la sesión
 session_start();
 // Acceder a las variables de sesión
-if (empty($_SESSION['usuarioDAW208LoginLogOffTema5']) || empty($_SESSION['numConexiones']) || empty($_SESSION['ultimaConexion'])) {
+if (empty($_SESSION['usuarioDAW208LoginLogOffTema5'])) {
     // Redirige a la página de inicio de sesión
     header("Location:Login.php"); 
     exit();
