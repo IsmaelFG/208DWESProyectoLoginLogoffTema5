@@ -9,8 +9,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header("Location: codigoPHP/Login.php");
     exit();
 }
-if (isset($_GET['idioma'])) {
-    $idioma = $_GET['idioma'];
+if (isset($_REQUEST['idioma'])) {
+    $idioma = $_REQUEST['idioma'];
     setcookie("idioma", $idioma, time() + (30 * 24 * 60 * 60), "/");
     header('Location: ' . $_SERVER['PHP_SELF']);
     exit;

@@ -4,8 +4,9 @@
  * @version 1.0
  * @since 1/12/2023
  */
+// Redirige a la página principal de la aplicacion si pulsa volver
 if (isset($_REQUEST['volver'])) {
-    header('Location:../indexProyectoLoginLogoffTema5.php'); // Redirige a la página
+    header('Location:../indexProyectoLoginLogoffTema5.php');
     exit();
 }
 include_once('../core/231018libreriaValidacion.php'); // Importar la librería de validación
@@ -64,7 +65,8 @@ if ($entradaOK) {
 
     // Redirigir a programa.php
     header("Location:Programa.php");
-    exit(); // Asegurarse de que el script se detenga después de la redirección
+    // Asegurarse de que el script se detenga después de la redirección
+    exit();
 } else {
     //Si el fromulario a sido enviado pero el usuario o contraseña no ha sido valdiado 
     // Mostramos un mensaje de error y el formulario nuevamente
