@@ -4,10 +4,12 @@
  * @version 1.0
  * @since 1/12/2023
  */
-session_start(); // Recuperar la sesión
-// Acceder a las variables de sesión
+// Recuperar la sesión
+session_start();
+//Si se intenta acceder a la pagina sin iniciar sesion redirige a la pagina de inicio de la aplicación
 if (empty($_SESSION['usuarioDAW208LoginLogOffTema5'])) {
-    header("Location:Login.php"); // Redirige a la página de inicio de sesión
+    // Redirige a la página de inicio de sesión
+    header("Location:../indexProyectoLoginLogoffTema5.php");
     exit();
 }
 // Cerrar sesión al hacer clic en el botón
@@ -23,10 +25,8 @@ if (isset($_POST['detalle'])) {
     header('Location:Detalle.php'); // Redirige a la página
     exit();
 }
-$idioma = isset($_COOKIE['idioma']) ? $_COOKIE['idioma'] : 'es';
-
 // Define los mensajes según el idioma
-if ($idioma == 'es') {
+if ($_COOKIE['idioma'] == 'es') {
     $bienvenida = "Bienvenido, {$_SESSION['usuarioDAW208LoginLogOffTema5']}.<br>";
     $numConexiones = "Esta es tu {$_SESSION['numConexiones']} vez conectándote.<br>";
     if ($_SESSION['numConexiones'] == 1) {
@@ -34,7 +34,7 @@ if ($idioma == 'es') {
     } else {
         $ultimaConexion = "Te conectaste por última vez {$_SESSION['ultimaConexion']}.";
     }
-} elseif ($idioma == 'en') {
+} elseif ($_COOKIE['idioma'] == 'en') {
     $bienvenida = "Welcome, {$_SESSION['usuarioDAW208LoginLogOffTema5']}.<br>";
     $numConexiones = "This is your {$_SESSION['numConexiones']} time logging in.<br>";
     if ($_SESSION['numConexiones'] == 1) {
@@ -43,7 +43,7 @@ if ($idioma == 'es') {
         $ultimaConexion = "You last logged in on {$_SESSION['ultimaConexion']}.";
     }
 }
-// Mostrar la información
+// Mostrar el mensaje
 echo $bienvenida;
 echo $numConexiones;
 echo $ultimaConexion;

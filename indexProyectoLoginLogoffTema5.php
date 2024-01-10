@@ -4,12 +4,20 @@
  * @version 1.0
  * @since 21/11/2023
  */
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Redirige a la página del programa
+// Comprobamos si la cookie esta declarada
+if (!isset($_COOKIE['idioma'])) {
+    // En caso negativo la creamos y ponemos el valor por defecto
+    setcookie("idioma", "es", time() + (30 * 24 * 60 * 60), "/");
+}
+//Comprobamos si pulsa el boton login
+if (isset($_REQUEST['login'])) {
+    // Redirige a la página de login
     header("Location: codigoPHP/Login.php");
     exit();
 }
+//Comprobamos si pulsa algun boton de idioma
 if (isset($_REQUEST['idioma'])) {
+//Cambiamos la cookie al idioma seleccionado y refrescamos la pagina
     $idioma = $_REQUEST['idioma'];
     setcookie("idioma", $idioma, time() + (30 * 24 * 60 * 60), "/");
     header('Location: ' . $_SERVER['PHP_SELF']);
@@ -23,7 +31,6 @@ if (isset($_REQUEST['idioma'])) {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Ismael Ferreras García</title>
-        <!-- Incluye el CSS de Bootstrap desde un CDN -->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
         <link rel="stylesheet" href="/208DWESProyectoTema3/webroot/css/style.css">
         <style>
@@ -51,21 +58,20 @@ if (isset($_REQUEST['idioma'])) {
         <nav class="navbar navbar-expand-lg bg-primary">
             <div class="container">
                 <a class="navbar-brand text-white" href="/index.html">LoginLogoffTema5</a>
-
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                         aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div>
-                    <a class="boton" href="?idioma=es">
-                        <img src="webroot/imagenes/spain.jpg" alt="es" width="30" height="20">
-                    </a>
-                    <a class="boton" href="?idioma=en">
-                        <img src="webroot/imagenes/english.png" alt="en" width="30" height="20">
-                    </a>
-                </div>              
                 <form method="post" action="">
-                    <button type="submit" class="btn btn-primary">Login</button>
+                    <button type="submit" name="idioma" value="es" class="btn btn-primary">
+                        <img src="webroot/imagenes/spain.jpg" alt="es" width="30" height="20">
+                    </button>
+                    <button type="submit" name="idioma" value="en" class="btn btn-primary">
+                        <img src="webroot/imagenes/english.png" alt="en" width="30" height="20">
+                    </button>
+                </form>              
+                <form method="post" action="">
+                    <button type="submit" name="login" class="btn btn-primary">Login</button>
                 </form>
 
             </div>
