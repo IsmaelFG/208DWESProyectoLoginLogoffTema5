@@ -8,7 +8,7 @@
 session_start();
 //Si se intenta acceder a la pagina sin iniciar sesion redirige a la pagina de inicio de la aplicación
 if (empty($_SESSION['usuarioDAW208LoginLogOffTema5'])) {
-    // Redirige a la página de inicio de sesión
+    // Redirige a la página de inicio
     header("Location:../indexProyectoLoginLogoffTema5.php");
     exit();
 }
@@ -16,7 +16,7 @@ if (empty($_SESSION['usuarioDAW208LoginLogOffTema5'])) {
 if (isset($_POST['cerrar_sesion'])) {
     session_unset(); // Desvincula todas las variables de sesión
     session_destroy(); // Destruye la sesión
-    header("Location:Login.php"); // Redirige a la página de inicio de sesión
+    header("Location:../indexProyectoLoginLogoffTema5.php"); // Redirige a la página de inicio de sesión
     exit();
 }
 
