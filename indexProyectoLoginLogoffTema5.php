@@ -73,7 +73,6 @@ if (isset($_REQUEST['idioma'])) {
                 <form method="post" action="">
                     <button type="submit" name="login" class="btn btn-primary">Login</button>
                 </form>
-
             </div>
         </nav>
         <div class="position-absolute top-50 start-50 translate-middle">
